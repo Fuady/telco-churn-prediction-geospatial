@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+*.so
+*.dylib
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Data files — don't commit raw/processed data to git
+data/raw/
+data/processed/
+data/external/
+data/models/
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/external/.gitkeep
+!data/models/.gitkeep
+
+# MLflow runs
+mlruns/
+mlflow.db
+
+# Airflow
+logs/
+airflow.db
+airflow-webserver.pid
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Secrets
+.env
+*.pem
+*.key
+
+# Generated docs (regenerate with notebooks)
+docs/eda_*.png
+docs/geo_*.html
+docs/geo_*.png
+
+# Docker
+.docker/
+
+# Coverage
+.coverage
+htmlcov/
+.pytest_cache/
