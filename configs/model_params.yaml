@@ -1,0 +1,53 @@
+# ─────────────────────────────────────────────────────────────
+# configs/model_params.yaml  —  Model hyperparameters
+# ─────────────────────────────────────────────────────────────
+
+xgboost:
+  n_estimators: 500
+  max_depth: 6
+  learning_rate: 0.05
+  subsample: 0.8
+  colsample_bytree: 0.8
+  min_child_weight: 5
+  gamma: 0.1
+  reg_alpha: 0.1
+  reg_lambda: 1.0
+  scale_pos_weight: 4.5    # ~(n_negatives / n_positives) for imbalanced data
+  eval_metric: "aucpr"
+  early_stopping_rounds: 50
+  random_state: 42
+  n_jobs: -1
+
+lightgbm:
+  n_estimators: 500
+  max_depth: 6
+  learning_rate: 0.05
+  num_leaves: 63
+  subsample: 0.8
+  colsample_bytree: 0.8
+  min_child_samples: 20
+  reg_alpha: 0.1
+  reg_lambda: 1.0
+  is_unbalance: true
+  metric: "average_precision"
+  early_stopping_rounds: 50
+  random_state: 42
+  n_jobs: -1
+
+optuna:
+  n_trials: 50
+  timeout_seconds: 3600
+  direction: "maximize"
+  metric: "pr_auc"
+  search_space:
+    max_depth: [3, 8]
+    learning_rate: [0.01, 0.3]
+    n_estimators: [100, 1000]
+    subsample: [0.6, 1.0]
+    colsample_bytree: [0.6, 1.0]
+    min_child_weight: [1, 10]
+
+smote:
+  sampling_strategy: 0.5
+  k_neighbors: 5
+  random_state: 42

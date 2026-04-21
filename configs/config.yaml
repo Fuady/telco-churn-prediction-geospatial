@@ -1,0 +1,72 @@
+# ─────────────────────────────────────────────────────────────
+# configs/config.yaml  —  Main project configuration
+# ─────────────────────────────────────────────────────────────
+
+project:
+  name: "telecom-churn-geospatial"
+  version: "1.0.0"
+  description: "Churn prediction with geospatial risk mapping"
+
+paths:
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  external_data: "data/external"
+  models: "data/models"
+  logs: "logs"
+
+data_generation:
+  n_subscribers: 50000
+  churn_rate: 0.18          # 18% base churn — realistic for telco
+  random_seed: 42
+  # Geographic bounding box (Jakarta + surrounding region)
+  geo_bounds:
+    lat_min: -7.0
+    lat_max: -5.5
+    lon_min: 106.4
+    lon_max: 107.5
+
+features:
+  target_column: "churned"
+  subscriber_id_column: "subscriber_id"
+  date_column: "snapshot_date"
+  # H3 resolution: 8 = ~0.74 km² cells (city-block level)
+  h3_resolution: 8
+  # Look-back window for usage features (months)
+  usage_lookback_months: 3
+  train_test_split: 0.8
+  validation_split: 0.1
+
+model:
+  experiment_name: "telecom_churn_prediction"
+  registered_model_name: "churn_xgboost"
+  # Optimise for PR-AUC (better for imbalanced churn data)
+  primary_metric: "pr_auc"
+  # Classification threshold (tuned on validation set)
+  decision_threshold: 0.45
+
+geo_risk:
+  # H3 resolution for the output risk map
+  risk_map_resolution: 7     # ~5.2 km² — neighbourhood level
+  min_subscribers_per_cell: 10
+  risk_tiers:
+    LOW: [0.0, 0.25]
+    MEDIUM: [0.25, 0.50]
+    HIGH: [0.50, 0.70]
+    CRITICAL: [0.70, 1.0]
+
+mlflow:
+  tracking_uri: "http://localhost:5000"
+  artifact_location: "mlruns"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  model_stage: "Production"
+
+monitoring:
+  psi_threshold: 0.2         # Population Stability Index alert threshold
+  drift_check_features:
+    - "data_usage_gb"
+    - "monthly_charges"
+    - "call_drops_monthly"
+    - "rsrq_avg"
