@@ -1,0 +1,139 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────
+# Full telecom-churn-geospatial stack
+#   - api          : FastAPI prediction service   → :8000
+#   - dashboard    : Streamlit dashboard          → :8501
+#   - mlflow       : MLflow tracking server       → :5000
+#   - airflow-web  : Airflow webserver            → :8080
+#   - airflow-sched: Airflow scheduler
+#   - postgres     : Airflow metadata DB
+#
+# Usage:
+#   cd mlops/docker
+#   docker-compose up --build
+# ─────────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL (Airflow metadata) ──────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # ── MLflow tracking server ─────────────────────────────────
+  mlflow:
+    image: python:3.10-slim
+    command: >
+      bash -c "pip install mlflow==2.12.2 psycopg2-binary --quiet &&
+               mlflow server
+               --backend-store-uri sqlite:///mlflow.db
+               --default-artifact-root /mlruns
+               --host 0.0.0.0
+               --port 5000"
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlruns
+    restart: unless-stopped
+
+  # ── FastAPI Prediction API ─────────────────────────────────
+  api:
+    build:
+      context: ../..
+      dockerfile: mlops/docker/Dockerfile.api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../data:/app/data
+      - ../../configs:/app/configs
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - mlflow
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ── Streamlit Dashboard ────────────────────────────────────
+  dashboard:
+    build:
+      context: ../..
+      dockerfile: mlops/docker/Dockerfile.dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ../../data:/app/data
+      - ../../configs:/app/configs
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # ── Airflow webserver ──────────────────────────────────────
+  airflow-webserver:
+    build:
+      context: ../..
+      dockerfile: mlops/docker/Dockerfile.api
+    command: >
+      bash -c "pip install apache-airflow==2.9.1 --quiet &&
+               airflow db init &&
+               airflow users create --username admin --password admin
+                 --firstname Admin --lastname User --role Admin
+                 --email admin@example.com &&
+               airflow webserver --port 8080"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../../mlops/airflow/dags:/opt/airflow/dags
+      - ../../data:/app/data
+      - ../../configs:/app/configs
+      - airflow_logs:/opt/airflow/logs
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Airflow scheduler ──────────────────────────────────────
+  airflow-scheduler:
+    build:
+      context: ../..
+      dockerfile: mlops/docker/Dockerfile.api
+    command: >
+      bash -c "pip install apache-airflow==2.9.1 --quiet &&
+               airflow scheduler"
+    volumes:
+      - ../../mlops/airflow/dags:/opt/airflow/dags
+      - ../../data:/app/data
+      - ../../configs:/app/configs
+      - airflow_logs:/opt/airflow/logs
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    depends_on:
+      - airflow-webserver
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  mlflow_data:
+  airflow_logs:
