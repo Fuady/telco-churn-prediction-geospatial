@@ -88,7 +88,7 @@ See [`docs/data_sources.md`](docs/data_sources.md) for full download instruction
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 telecom-churn-geospatial/
