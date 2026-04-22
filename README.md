@@ -26,7 +26,7 @@
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 Telecom companies lose 15–25% of subscribers annually to churn, costing millions in lost revenue. Traditional churn models treat customers uniformly — but **where** a customer lives and what network quality they experience are critical signals that are often ignored.
 
