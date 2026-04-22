@@ -393,7 +393,7 @@ Full API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ---
 
-## 📄 License
+## License
 
 MIT License — see [LICENSE](LICENSE) for details.
 
