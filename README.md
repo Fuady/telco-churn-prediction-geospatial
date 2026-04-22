@@ -43,7 +43,7 @@ This project answers three business questions:
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 Data Sources          Data Engineering       ML Pipeline          Production
