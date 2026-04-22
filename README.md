@@ -396,9 +396,3 @@ Full API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
-
----
-
-## 👤 Author
-
-Built as a portfolio project demonstrating end-to-end data science at the intersection of **geospatial analytics**, **telecom**, and **marketing intelligence**.
