@@ -231,7 +231,7 @@ uvicorn src.api.app:app --reload --port 8000
 
 ---
 
-## 📖 Step-by-Step Guide
+## Step-by-Step Guide
 
 ### Step 1 — Data Engineering
 
