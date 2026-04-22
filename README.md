@@ -303,7 +303,7 @@ Services:
 
 ---
 
-## 📈 Results
+## Results
 
 | Metric | Score |
 |---|---|
