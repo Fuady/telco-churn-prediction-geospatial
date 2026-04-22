@@ -63,7 +63,7 @@ OpenCelliD ──────────► Data Quality ───────�
 
 ---
 
-## 📊 Dataset
+## Dataset
 
 This project uses **two complementary data sources**:
 
