@@ -322,7 +322,7 @@ See [`docs/results.md`](docs/results.md) for full analysis.
 
 ---
 
-## 🚀 MLOps & Production
+## MLOps & Production
 
 ### Automated Pipeline (Airflow)
 The Airflow DAG (`mlops/airflow/dags/churn_pipeline_dag.py`) runs weekly:
