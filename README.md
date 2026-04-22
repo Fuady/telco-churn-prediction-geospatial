@@ -343,7 +343,7 @@ The Airflow DAG (`mlops/airflow/dags/churn_pipeline_dag.py`) runs weekly:
 
 ---
 
-## 🔌 API Reference
+## API Reference
 
 **POST** `/predict` — Score a single subscriber
 
